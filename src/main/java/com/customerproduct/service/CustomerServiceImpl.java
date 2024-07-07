@@ -4,15 +4,12 @@ import com.customerproduct.dto.SearchDto;
 import com.customerproduct.model.Customer;
 import com.customerproduct.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class CustomerServiceImpl implements CustomerService{
+public class CustomerServiceImpl implements CustomerService {
 
     @Autowired
     CustomerRepository customerRepository;
@@ -28,7 +25,7 @@ public class CustomerServiceImpl implements CustomerService{
 
     public List<Customer> getAllCustomers(SearchDto searchDto) {
         try {
-            if(searchDto.getClient()<=0){
+            if (searchDto.getClient() <= 0) {
                 throw new Exception("Client Id is required");
             }
             return customerRepository.getAllCustomers(searchDto);
@@ -40,7 +37,7 @@ public class CustomerServiceImpl implements CustomerService{
 
     public List<Customer> getCustomer(SearchDto searchDto) {
         try {
-            if(searchDto.getClient()<=0) {
+            if (searchDto.getClient() <= 0) {
                 throw new Exception("Client id is required");
             }
             return customerRepository.getCustomer(searchDto);

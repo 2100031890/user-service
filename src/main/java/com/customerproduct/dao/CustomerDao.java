@@ -28,7 +28,6 @@ public class CustomerDao implements CustomerRepository {
 
     @Override
     public boolean addOrUpdateCustomer(Customer customer) {
-        boolean response;
         Session session = sessionFactory.openSession();
         try {
             Transaction transaction = session.beginTransaction();
@@ -44,7 +43,7 @@ public class CustomerDao implements CustomerRepository {
     }
 
     @Override
-    @Cacheable(value="customers",key="#client")
+    @Cacheable(value = "customers", key = "#client")
     public List<Customer> getAllCustomers(SearchDto searchDto) {
         Session session = sessionFactory.openSession();
         List<Customer> customers = null;
@@ -93,8 +92,8 @@ public class CustomerDao implements CustomerRepository {
             }
 
             Query query = session.createQuery(hql.toString(), Customer.class);
-
             query.setParameter("client", searchDto.getClient());
+
             if (CustomerProductUtils.isNotNullAndEmpty(searchDto.getName())) {
                 query.setParameter("name", searchDto.getName());
             }
@@ -107,7 +106,6 @@ public class CustomerDao implements CustomerRepository {
             if (CustomerProductUtils.isNotNullAndEmpty(searchDto.getEmail())) {
                 query.setParameter("email", searchDto.getEmail());
             }
-
             if (searchDto.getLastModifiedDate() != null) {
                 query.setParameter("lastModifiedDate", searchDto.getLastModifiedDate());
             }
@@ -128,9 +126,8 @@ public class CustomerDao implements CustomerRepository {
     }
 
     @Override
-    @KafkaListener(topics = AppConstants.CUSTOMER_ADD_UPDATE_TOPIC_NAME,groupId =AppConstants.GROUP_ID,containerFactory = "customerListener")
+    @KafkaListener(topics = AppConstants.CUSTOMER_ADD_UPDATE_TOPIC_NAME, groupId = AppConstants.GROUP_ID, containerFactory = "customerListener")
     public boolean addOrUpdateCustomerBulk(Customer customer) {
-        boolean response;
         Session session = sessionFactory.openSession();
         try {
             Transaction transaction = session.beginTransaction();
