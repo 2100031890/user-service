@@ -9,7 +9,7 @@ public class SearchDto {
     private int id;
     private Integer client;
     private String name;
-    private Timestamp lastModifiedDate ;
+    private Timestamp lastModifiedDate;
     private Timestamp create_date;
     private String phoneNo;
     private String customerCode;

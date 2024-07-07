@@ -27,7 +27,7 @@ public class Customer {
     @UpdateTimestamp
     private Timestamp lastModifiedDate;
 
-    @Column(name = "create_date",updatable = false,insertable = false)
+    @Column(name = "create_date", updatable = false, insertable = false)
     @CreatedDate
     private Timestamp createDate;
 

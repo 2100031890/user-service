@@ -4,6 +4,7 @@ import com.customerproduct.dto.SearchDto;
 import com.customerproduct.model.Customer;
 import com.customerproduct.service.CustomerService;
 import com.customerproduct.service.KafkaService;
+import com.customerproduct.validator.CustomerValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,17 +24,19 @@ public class CustomerController {
     @Autowired
     KafkaService kafkaService;
 
+    @Autowired
+    CustomerValidator customerValidator;
+
     @PostMapping(value = "add-customer")
     public ResponseEntity<?> addOrUpdateCustomer(@RequestBody Customer customer) {
         Map<String, Object> response = new HashMap<>();
         try {
-            boolean customerAddedOrUpdated=customerService.addOrUpdateCustomer(customer);
-            if(customerAddedOrUpdated)
-            {
+            customerValidator.isValidCustomer(customer);
+            boolean customerAddedOrUpdated = customerService.addOrUpdateCustomer(customer);
+            if (customerAddedOrUpdated) {
                 response.put("message", "Customer added/updated successfully");
-            }
-            else{
-                response.put("message","Customer added/updated failed");
+            } else {
+                response.put("message", "Customer added/updated failed");
             }
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -42,6 +45,7 @@ public class CustomerController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+
     @GetMapping(value = "/get-customers")
     public ResponseEntity<?> getAllCustomers(@RequestBody SearchDto searchDto) {
         Map<String, Object> response = new HashMap<>();
@@ -77,11 +81,10 @@ public class CustomerController {
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            response.put("message", "Internal Server Error "+e.getMessage());
+            response.put("message", "Internal Server Error " + e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
     }
-
 
     @PostMapping(value = "/add-customer-bulk")
     public ResponseEntity<?> bulkAddOrUpdateCustomer(@RequestBody List<Customer> customers) {
@@ -96,12 +99,10 @@ public class CustomerController {
                 response.put("message", "Something went wrong while Bulk Add or Update ");
                 return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
             }
-
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            response.put("message", "Internal Server Error "+e.getMessage());
+            response.put("message", "Internal Server Error " + e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
-
     }
 }
