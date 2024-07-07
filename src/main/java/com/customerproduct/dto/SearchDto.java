@@ -14,6 +14,6 @@ public class SearchDto {
     private String phoneNo;
     private String customerCode;
     private String email;
-
-
+    private Integer limit;
+    private Integer offset;
 }

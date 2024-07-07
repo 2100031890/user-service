@@ -45,16 +45,16 @@ public class CustomerDao implements CustomerRepository {
 
     @Override
     @Cacheable(value="customers",key="#client")
-    public List<Customer> getAllCustomers(int offset, int limit,int client) {
+    public List<Customer> getAllCustomers(SearchDto searchDto) {
         Session session = sessionFactory.openSession();
         List<Customer> customers = null;
         try {
             CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
             CriteriaQuery<Customer> criteriaQuery = criteriaBuilder.createQuery(Customer.class);
             Root<Customer> root = criteriaQuery.from(Customer.class);
-            Predicate clientPredicate = criteriaBuilder.equal(root.get("client"), client);
+            Predicate clientPredicate = criteriaBuilder.equal(root.get("client"), searchDto.getClient());
             criteriaQuery.select(root).where(clientPredicate);
-            customers = session.createQuery(criteriaQuery).setFirstResult(offset * limit).setMaxResults(limit).getResultList();
+            customers = session.createQuery(criteriaQuery).setFirstResult(searchDto.getOffset() * searchDto.getLimit()).setMaxResults(searchDto.getLimit()).getResultList();
             System.out.println(customers);
         } catch (Exception e) {
             System.out.println("Exception occurred at getAllCustomers() " + e);
