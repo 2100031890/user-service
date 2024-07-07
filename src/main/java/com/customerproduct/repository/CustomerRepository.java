@@ -12,4 +12,6 @@ public interface CustomerRepository {
     List<Customer> getAllCustomers(int offset, int limit,int client);
 
     List<Customer> getCustomer(SearchDto searchDto);
+
+    boolean addOrUpdateCustomerBulk(Customer customer);
 }
