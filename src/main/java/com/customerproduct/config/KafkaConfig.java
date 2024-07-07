@@ -13,11 +13,11 @@ import java.util.List;
 public class KafkaConfig {
     @Bean
     public NewTopic topic() {
-        return TopicBuilder.name(AppConstants.CUSTOMER_ADD_UPDATE_TOPIC_NAME).build();
+        return new NewTopic(AppConstants.CUSTOMER_ADD_UPDATE_TOPIC_NAME,1,(short)3);
     }
 
-    @KafkaListener(topics = AppConstants.CUSTOMER_ADD_UPDATE_TOPIC_NAME,groupId =AppConstants.GROUP_ID)
-    public void BulkUpdateConsumer (String customer) {
-        System.out.println(customer);
-    }
+//    @KafkaListener(topics = AppConstants.CUSTOMER_ADD_UPDATE_TOPIC_NAME,groupId =AppConstants.GROUP_ID)
+//    public void BulkUpdateConsumer (String customer) {
+//        System.out.println(customer);
+//    }
 }

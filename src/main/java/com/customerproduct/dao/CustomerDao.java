@@ -1,5 +1,6 @@
 package com.customerproduct.dao;
 
+import com.customerproduct.constants.AppConstants;
 import com.customerproduct.dto.SearchDto;
 import com.customerproduct.model.Customer;
 import com.customerproduct.repository.CustomerRepository;
@@ -13,6 +14,9 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -40,6 +44,7 @@ public class CustomerDao implements CustomerRepository {
     }
 
     @Override
+    @Cacheable(value="customers",key="#client")
     public List<Customer> getAllCustomers(int offset, int limit,int client) {
         Session session = sessionFactory.openSession();
         List<Customer> customers = null;
@@ -60,6 +65,7 @@ public class CustomerDao implements CustomerRepository {
     }
 
     @Override
+//    @Cacheable(value = "customers", key = "{#searchDto.client, #searchDto.name, #searchDto.phoneNo, #searchDto.customerCode, #searchDto.email, #searchDto.lastModifiedDate, #searchDto.create_date, #searchDto.id}")
     public List<Customer> getCustomer(SearchDto searchDto) {
         try (Session session = sessionFactory.openSession()) {
             StringBuilder hql = new StringBuilder("FROM Customer WHERE client = :client");
@@ -119,5 +125,23 @@ public class CustomerDao implements CustomerRepository {
             System.out.println("Exception occurred at getCustomers() " + e);
             return null;
         }
+    }
+
+    @Override
+    @KafkaListener(topics = AppConstants.CUSTOMER_ADD_UPDATE_TOPIC_NAME,groupId =AppConstants.GROUP_ID,containerFactory = "customerListener")
+    public boolean addOrUpdateCustomerBulk(Customer customer) {
+        boolean response;
+        Session session = sessionFactory.openSession();
+        try {
+            Transaction transaction = session.beginTransaction();
+            session.merge(customer);
+            transaction.commit();
+            return true;
+        } catch (Exception e) {
+            System.out.println("Exception occurred at addOrUpdateCustomer() " + e);
+        } finally {
+            if (session.isOpen()) session.close();
+        }
+        return false;
     }
 }
