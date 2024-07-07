@@ -9,7 +9,7 @@ import java.util.List;
 public interface CustomerRepository {
     boolean addOrUpdateCustomer(Customer customer);
 
-    List<Customer> getAllCustomers(int offset, int limit,int client);
+    List<Customer> getAllCustomers(SearchDto searchDto);
 
     List<Customer> getCustomer(SearchDto searchDto);
 
