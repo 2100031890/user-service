@@ -13,6 +13,8 @@ import jakarta.persistence.criteria.Root;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.EnableCaching;
@@ -26,6 +28,8 @@ public class CustomerDao implements CustomerRepository {
     @Autowired
     SessionFactory sessionFactory;
 
+    private final Logger log =  LoggerFactory.getLogger(CustomerDao.class);
+
     @Override
     public boolean addOrUpdateCustomer(Customer customer) {
         Session session = sessionFactory.openSession();
@@ -35,7 +39,7 @@ public class CustomerDao implements CustomerRepository {
             transaction.commit();
             return true;
         } catch (Exception e) {
-            System.out.println("Exception occurred at addOrUpdateCustomer() " + e);
+            log.error("Exception occurred at addOrUpdateCustomer() Method in Customer Dao " , e);
         } finally {
             if (session.isOpen()) session.close();
         }
@@ -43,7 +47,7 @@ public class CustomerDao implements CustomerRepository {
     }
 
     @Override
-    @Cacheable(value = "customers", key = "#client")
+    @Cacheable(value = "customers", key = "#searchDTO.id")
     public List<Customer> getAllCustomers(SearchDto searchDto) {
         Session session = sessionFactory.openSession();
         List<Customer> customers = null;
@@ -54,9 +58,8 @@ public class CustomerDao implements CustomerRepository {
             Predicate clientPredicate = criteriaBuilder.equal(root.get("client"), searchDto.getClient());
             criteriaQuery.select(root).where(clientPredicate);
             customers = session.createQuery(criteriaQuery).setFirstResult(searchDto.getOffset() * searchDto.getLimit()).setMaxResults(searchDto.getLimit()).getResultList();
-            System.out.println(customers);
         } catch (Exception e) {
-            System.out.println("Exception occurred at getAllCustomers() " + e);
+            log.error("Exception occurred at getAllCustomers() in Customer Dao " , e);
         } finally {
             if (session.isOpen()) session.close();
         }
@@ -117,10 +120,10 @@ public class CustomerDao implements CustomerRepository {
             }
 
             List<Customer> customers = query.getResultList();
-            System.out.println(customers);
+            log.info("List of customers are : {} ",customers);
             return customers;
         } catch (Exception e) {
-            System.out.println("Exception occurred at getCustomers() " + e);
+            log.error("Exception occurred at getCustomers() in Customer Dao " ,e);
             return null;
         }
     }
@@ -135,7 +138,7 @@ public class CustomerDao implements CustomerRepository {
             transaction.commit();
             return true;
         } catch (Exception e) {
-            System.out.println("Exception occurred at addOrUpdateCustomer() " + e);
+             log.error("Exception occurred at bulkAddOrUpdateCustomer() in Customer Dao " , e);
         } finally {
             if (session.isOpen()) session.close();
         }
