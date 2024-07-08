@@ -1,30 +1,29 @@
 package com.customerproduct.validator;
 
+import com.customerproduct.dto.SearchDto;
 import com.customerproduct.exception.BadRequestException;
 import com.customerproduct.model.Customer;
-import org.springframework.stereotype.Component;
 
 import java.util.regex.Pattern;
 
-@Component
 public class CustomerValidator {
 
     private static final String PHONE_NUMBER_PATTERN = "\\+?[0-9]{10,15}";
     private static final String EMAIL_PATTERN = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
 
-    public void isPhoneNumberValid(String phoneNumber) throws BadRequestException {
+    public static void isPhoneNumberValid(String phoneNumber) throws BadRequestException {
         if (!Pattern.matches(PHONE_NUMBER_PATTERN, phoneNumber)) {
             throw new BadRequestException("Invalid phone number format");
         }
     }
 
-    public void isEmailValid(String email) throws BadRequestException {
+    public static void isEmailValid(String email) throws BadRequestException {
         if (!Pattern.matches(EMAIL_PATTERN, email)) {
             throw new BadRequestException("Invalid email format");
         }
     }
 
-    public void isValidCustomer(Customer customer) throws BadRequestException {
+    public static void isValidCustomer(Customer customer) throws BadRequestException {
         if (customer.getClient() <= 0) {
             throw new BadRequestException("Invalid client ID");
         }
@@ -35,7 +34,27 @@ public class CustomerValidator {
             throw new BadRequestException("Customer code cannot be empty");
         }
 
-        this.isPhoneNumberValid(customer.getPhoneNo());
-        this.isEmailValid(customer.getEmail());
+        isPhoneNumberValid(customer.getPhoneNo());
+        isEmailValid(customer.getEmail());
+    }
+
+
+    public static void validateGetAllCustomersParameters(SearchDto searchDto) throws BadRequestException {
+        if (searchDto.getClient() == null || searchDto.getClient() <= 0) {
+            throw new BadRequestException("Invalid or missing client ID: " + searchDto.getClient());
+        }
+        if (searchDto.getOffset() == null || searchDto.getOffset() < 0) {
+            searchDto.setOffset(0);
+        }
+        if (searchDto.getLimit() == null || searchDto.getLimit() <= 0) {
+            searchDto.setLimit(10);
+        }
+    }
+
+    public static void validateGetCustomer(SearchDto searchDto) throws BadRequestException {
+        if (searchDto.getClient() == null || searchDto.getClient() <= 0) {
+            throw new BadRequestException("Invalid or missing client ID: " + searchDto.getClient());
+        }
+
     }
 }
